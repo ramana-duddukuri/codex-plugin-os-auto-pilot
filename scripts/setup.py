@@ -141,9 +141,12 @@ def get_plugin_version() -> str:
 def populate_codex_cache() -> None:
     version = get_plugin_version()
     cache_dir = Path.home() / ".codex" / "plugins" / "cache" / "oniesoft" / "auto-pilot" / version
-    print(f"\n📂 Syncing plugin files to Codex cache ({cache_dir})...")
+    print(f"\n📂 Syncing clean plugin files to Codex cache ({cache_dir})...")
     try:
+        if cache_dir.exists():
+            shutil.rmtree(cache_dir, ignore_errors=True)
         cache_dir.mkdir(parents=True, exist_ok=True)
+
         items_to_copy = [
             ".codex-plugin",
             ".mcp.json",
@@ -162,6 +165,28 @@ def populate_codex_cache() -> None:
                 shutil.copytree(src, dst, dirs_exist_ok=True)
             elif src.is_file():
                 shutil.copy2(src, dst)
+
+        # In the cached .mcp.json, inject resolved uv path and UTF-8 env
+        uv_bin = find_uv_binary()
+        if uv_bin:
+            cached_mcp_json = cache_dir / ".mcp.json"
+            if cached_mcp_json.exists():
+                try:
+                    with open(cached_mcp_json, encoding="utf-8") as fh:
+                        mcp_cfg = json.load(fh)
+                    servers = mcp_cfg.get("mcp_servers") or mcp_cfg.get("mcpServers") or mcp_cfg
+                    if "auto-pilot" in servers:
+                        servers["auto-pilot"]["command"] = uv_bin
+                        servers["auto-pilot"]["env"] = {
+                            "PYTHONUNBUFFERED": "1",
+                            "PYTHONUTF8": "1",
+                            "PYTHONIOENCODING": "utf-8"
+                        }
+                    with open(cached_mcp_json, "w", encoding="utf-8") as fh:
+                        json.dump(mcp_cfg, fh, indent=2)
+                except Exception:
+                    pass
+
         print("   ✓ Plugin files cached successfully.")
     except Exception as e:
         print(f"   ⚠️  Could not populate cache directly: {e}")
@@ -238,12 +263,10 @@ startup_timeout_sec = 120
 
 
 def find_codex_cli() -> str | None:
-    # 1. Check PATH
     cli = shutil.which("codex") or shutil.which("codex.exe")
     if cli:
         return Path(cli).as_posix()
 
-    # 2. Standard OS install locations
     home = Path.home()
     possible_paths = [
         # macOS
@@ -255,6 +278,7 @@ def find_codex_cli() -> str | None:
         Path(os.environ.get("PROGRAMFILES", "")) / "ChatGPT" / "resources" / "codex.exe",
         Path(os.environ.get("PROGRAMFILES(X86)", "")) / "ChatGPT" / "resources" / "codex.exe",
         Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "codex" / "codex.exe",
+        Path(os.environ.get("LOCALAPPDATA", "")) / "OpenAI" / "Codex" / "bin" / "f71e347eb70b3d24" / "codex.exe",
         home / ".codex" / "bin" / "codex.exe",
         home / ".codex" / "bin" / "codex",
     ]

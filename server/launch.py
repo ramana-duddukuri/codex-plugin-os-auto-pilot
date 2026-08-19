@@ -16,6 +16,15 @@ import os
 import sys
 from collections.abc import MutableMapping
 
+# Ensure UTF-8 on Windows stdin/stdout/stderr for clean JSON-RPC communication
+if sys.platform == "win32":
+    try:
+        sys.stdin.reconfigure(encoding="utf-8")
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 PLUGIN_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # ${CODEX_PLUGIN_DATA} / ${ONIESOFT_DATA_DIR} is exported to plugin subprocesses
