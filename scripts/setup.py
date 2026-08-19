@@ -33,7 +33,7 @@ def check_python_version() -> None:
 def find_uv_binary() -> str | None:
     uv_bin = shutil.which("uv") or shutil.which("uv.exe")
     if uv_bin:
-        return uv_bin
+        return Path(uv_bin).as_posix()
 
     home = Path.home()
     possible_uv = [
@@ -41,10 +41,12 @@ def find_uv_binary() -> str | None:
         home / ".local" / "bin" / "uv.exe",
         home / ".cargo" / "bin" / "uv",
         home / ".cargo" / "bin" / "uv.exe",
+        Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "uv" / "uv.exe",
+        Path(os.environ.get("PROGRAMFILES", "")) / "uv" / "uv.exe",
     ]
     for p in possible_uv:
-        if p.exists():
-            return str(p)
+        if p and p.exists() and p.is_file():
+            return p.resolve().as_posix()
     return None
 
 
@@ -142,7 +144,6 @@ def populate_codex_cache() -> None:
     print(f"\n📂 Syncing plugin files to Codex cache ({cache_dir})...")
     try:
         cache_dir.mkdir(parents=True, exist_ok=True)
-        # Copy relevant directories and files
         items_to_copy = [
             ".codex-plugin",
             ".mcp.json",
@@ -175,6 +176,7 @@ def register_codex_config() -> None:
     plugin_root_posix = PLUGIN_ROOT.resolve().as_posix()
     req_file = (PLUGIN_ROOT / "server" / "requirements.txt").as_posix()
     launch_file = (PLUGIN_ROOT / "server" / "launch.py").as_posix()
+    uv_bin = find_uv_binary() or "uv"
     now_iso = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     config_text = ""
@@ -193,7 +195,22 @@ def register_codex_config() -> None:
 enabled = true
 """)
 
-    # 2. Register marketplace
+    # 2. Explicitly enable MCP tools under the plugin namespace
+    if '[plugins."auto-pilot@oniesoft".mcp_servers."auto-pilot"]' not in config_text:
+        additions.append(f"""
+[plugins."auto-pilot@oniesoft".mcp_servers."auto-pilot"]
+enabled = true
+default_tools_approval_mode = "prompt"
+""")
+
+    if '[plugins."auto-pilot".mcp_servers."auto-pilot"]' not in config_text:
+        additions.append(f"""
+[plugins."auto-pilot".mcp_servers."auto-pilot"]
+enabled = true
+default_tools_approval_mode = "prompt"
+""")
+
+    # 3. Register marketplace
     if '[marketplaces.oniesoft]' not in config_text:
         additions.append(f"""
 [marketplaces.oniesoft]
@@ -202,11 +219,11 @@ source_type = "local"
 source = "{plugin_root_posix}"
 """)
 
-    # 3. Register fallback MCP server
+    # 4. Register fallback MCP server
     if '[mcp_servers.auto-pilot]' not in config_text:
         additions.append(f"""
 [mcp_servers.auto-pilot]
-command = "uv"
+command = "{uv_bin}"
 args = ["run", "--with-requirements", "{req_file}", "--python", ">=3.10", "{launch_file}"]
 enabled = true
 startup_timeout_sec = 120
@@ -224,7 +241,7 @@ def find_codex_cli() -> str | None:
     # 1. Check PATH
     cli = shutil.which("codex") or shutil.which("codex.exe")
     if cli:
-        return cli
+        return Path(cli).as_posix()
 
     # 2. Standard OS install locations
     home = Path.home()
@@ -244,7 +261,7 @@ def find_codex_cli() -> str | None:
 
     for p in possible_paths:
         if p and p.exists() and p.is_file():
-            return str(p)
+            return p.resolve().as_posix()
     return None
 
 

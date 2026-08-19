@@ -843,7 +843,7 @@ async def add_or_remove_test_cases_from_test_run(
     name_terms = [term for term in query_terms if term not in unique_key_terms]
 
     if unique_key_terms:
-        print(f"Resolving unique keys to IDs for: {unique_key_terms}")
+        print(f"Resolving unique keys to IDs for: {unique_key_terms}", file=sys.stderr)
         resolved_unique_key_ids = await get_test_cases_uuid_by_unique_keys(
             GetTestCasesUUIDByUniqueKeyInput(
                 projectId=uuid.UUID(_project(input.projectId)),
@@ -887,7 +887,7 @@ async def add_or_remove_test_cases_from_test_run(
                 "page": str(page),
                 "size": str(size),
             }
-            print(f"Fetching test cases for filtering with params: {filter_params}")
+            print(f"Fetching test cases for filtering with params: {filter_params}", file=sys.stderr)
 
             filter_resp = await client.get_backend(
                 f"/testrun/v1/edittestrun/{input.id}/{_project(input.projectId)}",
@@ -1006,7 +1006,8 @@ async def get_projects_assigned_to_user(
         f"/projectusers/v1/getassignprojects/{_user(input.userID)}",
     )
     print(
-        f"Response from get projects assigned to user API: {resp['status_code']} - {resp['data']}"
+        f"Response from get projects assigned to user API: {resp['status_code']} - {resp['data']}",
+        file=sys.stderr,
     )
     if resp["status_code"] == 200:
         projects = resp["data"]
@@ -1298,7 +1299,7 @@ async def create_element(input: ElementCreationInput) -> ElementCreationOutput:
         ElementCreationOutput: Output containing details of the created element.
     """
     payload = input.model_dump(exclude={"token"}, mode="json", exclude_none=True)
-    print(f"Payload for creating element: {payload}")
+    print(f"Payload for creating element: {payload}", file=sys.stderr)
     resp = await client.post_backend(
         f"/elements/v1",
         payload,
