@@ -1,0 +1,18 @@
+{
+  "mcp_servers": {
+    "auto-pilot": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--with-requirements",
+        "server/requirements.txt",
+        "--python",
+        ">=3.10",
+        "server/launch.py"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  }
+}

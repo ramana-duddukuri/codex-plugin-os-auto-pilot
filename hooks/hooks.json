@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --with-requirements \"${PLUGIN_ROOT}/server/requirements.txt\" --python \">=3.10\" \"${PLUGIN_ROOT}/server/launch.py\" --bootstrap-only",
+            "statusMessage": "Bootstrapping Oniesoft Auto-Pilot dependencies"
+          }
+        ]
+      }
+    ]
+  }
+}

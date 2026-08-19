@@ -1,0 +1,20 @@
+{
+  "name": "auto-pilot",
+  "version": "0.1.0",
+  "description": "Create, run, and analyze web, API, mobile, and performance tests with Oniesoft Auto-Pilot.",
+  "author": { "name": "Oniesoft" },
+  "keywords": ["testing", "test-automation", "api-testing", "mobile-testing", "performance-testing", "qa"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "hooks": "./hooks/hooks.json",
+  "interface": {
+    "displayName": "Oniesoft Auto-Pilot",
+    "shortDescription": "Create, run, and analyze automated tests.",
+    "longDescription": "Use Oniesoft Auto-Pilot workflows to author, execute, schedule, and analyze web, API, mobile, and performance tests.",
+    "developerName": "Oniesoft",
+    "category": "Productivity",
+    "capabilities": ["Write"],
+    "defaultPrompt": ["Create API test cases from this OpenAPI specification.", "Analyze this failed Oniesoft test run.", "Generate a performance test from this endpoint."],
+    "brandColor": "#2563EB"
+  }
+}

@@ -1,0 +1,9 @@
+# Local dev venv + plugin data (created by launch.py / tests)
+.devvenv/
+.data/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.DS_Store
+.env
