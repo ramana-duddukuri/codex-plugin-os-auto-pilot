@@ -2,48 +2,69 @@
 
 Drive the Oniesoft test automation platform from OpenAI Codex and ChatGPT. This plugin packages Oniesoft's test authoring, execution, and triage workflows alongside a FastMCP server exposing 31 platform tools.
 
+**Full installation guide:** [docs/INSTALLATION.md](docs/INSTALLATION.md)
+
 ---
 
-## ⚡ Quick Start for Colleagues (1-Minute Setup)
+## Quick start
 
 ### 1. Requirements
-- **Python 3.10+** on PATH.
-- **[uv](https://github.com/astral-sh/uv)** (recommended for instant dependency syncing).
 
-### 2. Run Setup (Once per machine)
+- **Python 3.10+** — [python.org/downloads](https://www.python.org/downloads/)
+- **[uv](https://docs.astral.sh/uv/getting-started/installation/)** (recommended for dependency syncing)
+- **Git** — [git-scm.com](https://git-scm.com/downloads)
 
-- **macOS / Linux:**
-  ```bash
-  ./setup.sh
-  ```
-- **Windows (PowerShell):**
-  ```powershell
-  .\setup.ps1
-  ```
-- **Or directly via Python (Any OS):**
-  ```bash
-  python scripts/setup.py
-  ```
+### 2. Clone and run setup (once per machine)
 
-This script will:
-1. Pre-sync all server dependencies automatically.
-2. Register the local plugin marketplace in `~/.agents/plugins/marketplace.json`.
-3. Enable the MCP server in `~/.codex/config.toml`.
+```bash
+git clone https://bitbucket.org/onie-soft/auto-pilot-codex-plugin.git ~/auto-pilot-codex-plugin
+cd ~/auto-pilot-codex-plugin
+```
 
----
+**macOS / Linux:**
 
-## 📁 Project-Level Configuration (In Your Project / Workspace Folder)
+```bash
+./setup.sh
+```
 
-All credentials and project configurations are read strictly from your **working project directory** (the project folder you opened in Codex / ChatGPT), **not** from the plugin directory:
+**Windows (PowerShell):**
 
-### 1. Project `.env` (API Key)
-In your project root directory, create `.env`:
+```powershell
+.\setup.ps1
+```
+
+**Any OS:**
+
+```bash
+python scripts/setup.py
+```
+
+If `setup.ps1` fails with an execution policy error on Windows, open PowerShell **as Administrator** and run:
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+Then retry `.\setup.ps1`.
+
+The setup script will:
+
+1. Pre-sync server dependencies via `uv`
+2. Register the local marketplace in `~/.agents/plugins/marketplace.json`
+3. Enable the MCP server in `~/.codex/config.toml`
+
+### 3. Configure your test project
+
+In each project workspace, create:
+
+**`.env`** (API key):
+
 ```env
 PLATFORM_API_KEY=your-actual-oniesoft-api-key
 ```
 
-### 2. Project `config.json` (Project Settings)
-In your project root directory, create `config.json`:
+**`config.json`** (project settings):
+
 ```json
 {
   "companyId": "your-company-uuid",
@@ -54,49 +75,54 @@ In your project root directory, create `config.json`:
 }
 ```
 
+> Never commit `.env`. See `.env.example` for a template.
+
+### 4. Enable and use
+
+1. **Restart** ChatGPT Desktop or Codex
+2. **Plugins Directory** → **My Local Plugins** → enable **Oniesoft Auto-Pilot**
+3. Open your test project and start a new chat:
+
+```text
+@auto-pilot get details of test case TC-10508 using get_test_cases_with_filters
+```
+
+### Updating
+
+```bash
+cd ~/auto-pilot-codex-plugin && git pull
+./setup.sh          # or .\setup.ps1 on Windows
+```
+
+Then restart ChatGPT Desktop / Codex.
+
 ---
 
-## 🚀 Using the Plugin in ChatGPT Desktop / Codex
-
-1. **Restart** ChatGPT Desktop or Codex.
-2. In **Plugins Directory** (Marketplace picker), look under **My Local Plugins** and enable **Oniesoft Auto-Pilot**.
-3. Open your test project/workspace.
-4. Start a new chat session and test:
-   ```text
-   @auto-pilot get details of test case TC-10508 using get_test_cases_with_filters
-   ```
-
----
-
-## 📦 What's Inside
+## What's inside
 
 | Component | Description |
 | :--- | :--- |
-| **`skills/`** | 9 end-to-end testing workflows: `analyze-requirements`, `create-tests`, `run-tests`, `schedule-test-run`, `mobile-testing`, `performance-testing`, `create-datafile`, `analyze-run`, and `push-to-autopilot`. |
-| **`agents/`** | 3 specialist subagents: `test-author`, `failure-analyst`, `element-discoverer`. |
-| **`server/`** | Bundled FastMCP server exposing 31 typed tools over stdio and Streamable HTTP. |
-| **`.codex-plugin/plugin.json`** | Codex plugin manifest referencing skills, marketplace metadata, and `.mcp.json`. |
-| **`.mcp.json`** | Portable MCP server launch configuration using `uv`. |
-| **`hooks/hooks.json`** | `SessionStart` background dependency bootstrap hook. |
+| **`skills/`** | 9 workflows: `analyze-requirements`, `create-tests`, `run-tests`, `schedule-test-run`, `mobile-testing`, `performance-testing`, `create-datafile`, `analyze-run`, `push-to-autopilot` |
+| **`agents/`** | 3 subagents: `test-author`, `failure-analyst`, `element-discoverer` |
+| **`server/`** | FastMCP server with 31 typed tools |
+| **`.codex-plugin/plugin.json`** | Codex plugin manifest |
+| **`.mcp.json`** | MCP server launch config (via `uv`) |
+| **`hooks/hooks.json`** | SessionStart dependency bootstrap |
 
 ---
 
-## 🛠️ Installing via Codex CLI (Alternative)
+## Codex CLI (alternative)
 
-If using the Codex CLI directly:
 ```bash
-# Add the local marketplace from this repository
 codex plugin marketplace add .
-
-# Or inspect MCP server status
+codex plugin add auto-pilot@oniesoft
 codex mcp list
 ```
 
 ---
 
-## 🧪 Validating Locally
+## Local MCP validation
 
-You can test the MCP server interactively via the MCP Inspector:
 ```bash
 npx @modelcontextprotocol/inspector uv run --with-requirements server/requirements.txt --python ">=3.10" server/launch.py
 ```
