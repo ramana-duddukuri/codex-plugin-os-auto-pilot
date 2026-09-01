@@ -17,7 +17,7 @@ Drive the Oniesoft test automation platform from OpenAI Codex and ChatGPT. This 
 ### 2. Clone and run setup (once per machine)
 
 ```bash
-git clone https://bitbucket.org/onie-soft/auto-pilot-codex-plugin.git ~/auto-pilot-codex-plugin
+git clone https://github.com/ramana-duddukuri/codex-plugin-os-auto-pilot.git ~/auto-pilot-codex-plugin
 cd ~/auto-pilot-codex-plugin
 ```
 
