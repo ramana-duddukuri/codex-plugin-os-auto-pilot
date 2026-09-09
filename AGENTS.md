@@ -17,7 +17,7 @@ This plugin defines three specialized subagents for test creation, failure diagn
 - **Definition:** [`agents/failure-analyst.md`](agents/failure-analyst.md)
 
 ### 3. `element-discoverer`
-- **Role:** Specialist for resolving UI element locators (CSS, XPath, Playwright) from codebases, recordings, or live browsers.
+- **Role:** Specialist for resolving UI locators. Web: CSS, XPath, Playwright (Playwright MCP allowed). Mobile: Appium/Selenium xpath only. With no mobile recording or codebase, persist selector as the literal string `selector` — never Playwright JSON or Playwright MCP.
 - **When to Use:** Delegate during Phase 2 of test generation when filling out element info tables and authoring autopilot test steps.
 - **Tools:** `create_element`, `update_element`, `fetch_element_details_by_id`, `get_element_details_by_name_or_unique_key`
 - **Definition:** [`agents/element-discoverer.md`](agents/element-discoverer.md)
