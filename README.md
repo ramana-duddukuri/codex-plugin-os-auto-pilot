@@ -102,9 +102,9 @@ Then restart ChatGPT Desktop / Codex.
 
 | Component | Description |
 | :--- | :--- |
-| **`skills/`** | 9 workflows: `analyze-requirements`, `create-tests`, `run-tests`, `schedule-test-run`, `mobile-testing`, `performance-testing`, `create-datafile`, `analyze-run`, `push-to-autopilot` |
-| **`agents/`** | 3 subagents: `test-author`, `failure-analyst`, `element-discoverer` |
-| **`server/`** | FastMCP server with 31 typed tools |
+| **`skills/`** | 10 workflows: `analyze-requirements`, `create-tests`, `run-tests`, `schedule-test-run`, `mobile-testing`, `performance-testing`, `create-datafile`, `analyze-run`, `push-to-autopilot`, `create-defect` |
+| **`agents/`** | 4 subagents: `test-author`, `failure-analyst`, `element-discoverer`, `defect-creator` |
+| **`server/`** | FastMCP server with 37 typed tools |
 | **`.codex-plugin/plugin.json`** | Codex plugin manifest |
 | **`.mcp.json`** | MCP server launch config (via `uv`) |
 | **`hooks/hooks.json`** | SessionStart dependency bootstrap |

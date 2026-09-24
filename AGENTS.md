@@ -1,6 +1,10 @@
 # Oniesoft Auto-Pilot Specialist Agents
 
-This plugin defines three specialized subagents for test creation, failure diagnosis, and UI element discovery.
+This plugin defines specialized subagents for test creation, failure diagnosis, UI element discovery, and defect logging.
+
+## Tool scope
+
+`create_defect` — only call after reading and following `skills/create-defect/SKILL.md` through Step 5, or from within the `defect-creator` subagent. Never call it inline when the user asks to create a defect or log a bug without completing assignee selection (`get_users_assigned_to_project`) and user confirmation first.
 
 ## Available Agents
 
@@ -21,3 +25,10 @@ This plugin defines three specialized subagents for test creation, failure diagn
 - **When to Use:** Delegate during Phase 2 of test generation when filling out element info tables and authoring autopilot test steps.
 - **Tools:** `create_element`, `update_element`, `fetch_element_details_by_id`, `get_element_details_by_name_or_unique_key`
 - **Definition:** [`agents/element-discoverer.md`](agents/element-discoverer.md)
+
+### 4. `defect-creator`
+- **Role:** Specialist for logging Oniesoft defects from test failures or manual triage.
+- **When to Use:** Delegate when the user asks to create a defect, log a bug, or file an issue — including after test-run analysis when failures should become defects.
+- **Tools:** `create_defect`, `get_users_assigned_to_project`, `get_user_details_by_id_or_email_or_unique_key`, `get_module_id_by_name_or_unique_key`, `get_feature_id_by_name_or_unique_key`
+- **Definition:** [`agents/defect-creator.md`](agents/defect-creator.md)
+- **Skill:** Follow [`skills/create-defect/SKILL.md`](skills/create-defect/SKILL.md) end-to-end before calling `create_defect`.
